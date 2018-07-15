@@ -3,11 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace HotCorner
 {
@@ -18,16 +21,37 @@ namespace HotCorner
     {
         protected static Boolean isLocked = false;
 
-
-
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             MouseHook mouseHook = new MouseHook();
 
             // Capture mouse events
             mouseHook.MouseMove += new MouseHook.MouseHookCallback(mouseHook_MouseMove);
+           
+            var bitmap = new Bitmap("./icon.png");
+            var iconHandle = bitmap.GetHicon();
+            var icon = System.Drawing.Icon.FromHandle(iconHandle);
+
+            var notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon.Click += new EventHandler(notifyIcon_Click);
+            notifyIcon.Icon = icon;
+            notifyIcon.Visible = true;
 
             mouseHook.Install();
+        }
+
+        void notifyIcon_Click(object sender, EventArgs e)
+        {
+            var contextMenu = new ContextMenu();
+            var menuItem = new MenuItem
+            {
+                Header = "Exit"
+            };
+            contextMenu.Items.Add(menuItem);
+            contextMenu.IsOpen = true;
+
+            // For now this is everything we need for closing the app. Since the app has no window
+            // it will shut down when the context menu loses focus. No need to do anything here.
         }
 
         private void mouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
