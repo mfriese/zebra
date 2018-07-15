@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotCorner", "HotCorner\HotCorner.csproj", "{3E436AC2-4941-4C83-B447-1BE690B2FAA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zebra", "zebra\zebra.csproj", "{3E436AC2-4941-4C83-B447-1BE690B2FAA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

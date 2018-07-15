@@ -50,8 +50,7 @@ namespace HotCorner
             contextMenu.Items.Add(menuItem);
             contextMenu.IsOpen = true;
 
-            // For now this is everything we need for closing the app. Since the app has no window
-            // it will shut down when the context menu loses focus. No need to do anything here.
+            menuItem.Click += (s, a) => this.Shutdown();
         }
 
         private void mouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
