@@ -1,16 +1,7 @@
 ﻿using GlobalLowLevelHooks;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
 namespace HotCorner
 {
@@ -42,15 +33,7 @@ namespace HotCorner
 
         void notifyIcon_Click(object sender, EventArgs e)
         {
-            var contextMenu = new ContextMenu();
-            var menuItem = new MenuItem
-            {
-                Header = "Exit"
-            };
-            contextMenu.Items.Add(menuItem);
-            contextMenu.IsOpen = true;
-
-            menuItem.Click += (s, a) => this.Shutdown();
+            this.Shutdown();
         }
 
         private void mouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
