@@ -58,6 +58,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeyboardHook.cs" />
     <Compile Include="User32Util.cs" />
     <Compile Include="User32Keys.cs" />
     <Compile Include="MouseHook.cs" />
