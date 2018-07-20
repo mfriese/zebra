@@ -3,21 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows;
+using zebra;
 
 namespace HotCorner
 {
-    /// <summary>
-    /// Interaktionslogik für "App.xaml"
-    /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
-        protected static Boolean isLocked = false;
-
         protected static List<KeyboardHook.VKeys> releasedKeys = new List<KeyboardHook.VKeys>();
 
         protected static MouseHook mouseHook = null;
 
         protected static KeyboardHook keyHook = null;
+
+        protected static HotCorners Corners { get; } = new HotCorners();
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -25,20 +23,42 @@ namespace HotCorner
             keyHook = new KeyboardHook();
 
             // Capture mouse events
-            mouseHook.MouseMove += new MouseHook.MouseHookCallback(mouseHook_MouseMove);
+            mouseHook.MouseMove += MouseMove;
             keyHook.KeyUp += KeyHook_KeyUp;
 
+            // Show an Icon in the tray
             var bitmap = new Bitmap("./icon.png");
             var iconHandle = bitmap.GetHicon();
             var icon = System.Drawing.Icon.FromHandle(iconHandle);
 
             var notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Click += new EventHandler(NotifyIcon_Click);
+            notifyIcon.Click += NotifyIcon_Click;
             notifyIcon.Icon = icon;
             notifyIcon.Visible = true;
 
+            // Attach yourself to the system
             mouseHook.Install();
             keyHook.Install();
+
+            // Add Actions for hot corners
+            Corners.RegisterHandler(CORNER.UPPER_LEFT, () => ArrangeWindows());
+            Corners.RegisterHandler(CORNER.UPPER_RIGHT, () => ShowDesktop());
+        }
+
+        void NotifyIcon_Click(object sender, EventArgs e)
+        {
+            mouseHook.Uninstall();
+            keyHook.Uninstall();
+            this.Shutdown();
+        }
+
+        private void MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        {
+            Corners.TriggerOnHit(new System.Drawing.Point()
+            {
+                X = mouseStruct.pt.x,
+                Y = mouseStruct.pt.y
+            });
         }
 
         private void KeyHook_KeyUp(KeyboardHook.VKeys key)
@@ -54,41 +74,32 @@ namespace HotCorner
             if (releasedKeys.Count > 2)
             {
                 releasedKeys.Clear();
+
                 INPUT[] sequence = {
                     User32Util.MakeInput(KeyCode.ALT, false),
                     User32Util.MakeInput(KeyCode.F4, false),
                     User32Util.MakeInput(KeyCode.F4, true),
                     User32Util.MakeInput(KeyCode.ALT, true)
                 };
+
                 User32Util.SendInputSequence(sequence);
             }
         }
 
-        void NotifyIcon_Click(object sender, EventArgs e)
+        public void ShowDesktop()
         {
-            mouseHook.Uninstall();
-            keyHook.Uninstall();
-            this.Shutdown();
+            INPUT[] sequence = {
+                User32Util.MakeInput(KeyCode.LWIN, false),
+                User32Util.MakeInput(KeyCode.KEY_D, false),
+                User32Util.MakeInput(KeyCode.KEY_D, true),
+                User32Util.MakeInput(KeyCode.LWIN, true)
+            };
+
+            User32Util.SendInputSequence(sequence);
         }
 
-        private void mouseHook_MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        private void ArrangeWindows()
         {
-            Console.WriteLine(String.Format("{0} : {1}", mouseStruct.pt.x, mouseStruct.pt.y));
-
-            // Unlock and exit if mouse is outside the hot area
-            if (mouseStruct.pt.x > 4 || mouseStruct.pt.y > 4)
-            {
-                isLocked = false;
-                return;
-            }
-
-            // Do not allow restarts. If hot corner is locked stop.
-            if (isLocked)
-                return;
-
-            // Hot corner was not locked, lock it now.
-            isLocked = true;
-
             INPUT[] sequence = {
                 User32Util.MakeInput(KeyCode.LWIN, false),
                 User32Util.MakeInput(KeyCode.TAB, false),
@@ -96,7 +107,6 @@ namespace HotCorner
                 User32Util.MakeInput(KeyCode.LWIN, true)
             };
 
-            // Send the keystroke to windows, activate Mission Control.
             User32Util.SendInputSequence(sequence);
         }
     }

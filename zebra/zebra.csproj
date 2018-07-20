@@ -56,9 +56,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="HotAreas\Corner.cs" />
+    <Compile Include="HotAreas\HotCorners.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KeyboardHook.cs" />
+    <Compile Include="HotAreas\HotBox.cs" />
     <Compile Include="User32Util.cs" />
     <Compile Include="User32Keys.cs" />
     <Compile Include="MouseHook.cs" />
