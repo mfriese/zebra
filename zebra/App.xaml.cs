@@ -59,6 +59,8 @@ namespace HotCorner
                 X = mouseStruct.pt.x,
                 Y = mouseStruct.pt.y
             });
+
+            releasedKeys.Clear();
         }
 
         private void KeyHook_KeyUp(KeyboardHook.VKeys key)
