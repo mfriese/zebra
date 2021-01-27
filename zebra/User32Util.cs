@@ -20,7 +20,7 @@ namespace HotCorner
         internal static void SendInput(KeyCode keyCode, Boolean release)
         {
             INPUT[] inputs = new INPUT[] { MakeInput(keyCode, release) };
-            User32Util.SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
+			SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace HotCorner
         /// <param name="inputs">a sequence of key inputs.</param>
         internal static void SendInputSequence(params INPUT[] inputs)
         {
-            User32Util.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+			SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
         }
 
         /// <summary>

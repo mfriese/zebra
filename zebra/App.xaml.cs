@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows;
 using zebra;
 
 namespace HotCorner
 {
-    public partial class App : System.Windows.Application
+    public partial class App : Application
     {
         protected static List<KeyboardHook.VKeys> releasedKeys = new List<KeyboardHook.VKeys>();
 
@@ -29,7 +30,7 @@ namespace HotCorner
             // Show an Icon in the tray
             var bitmap = new Bitmap("./icon.png");
             var iconHandle = bitmap.GetHicon();
-            var icon = System.Drawing.Icon.FromHandle(iconHandle);
+            var icon = Icon.FromHandle(iconHandle);
 
             var notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Click += NotifyIcon_Click;
@@ -41,18 +42,18 @@ namespace HotCorner
             keyHook.Install();
 
             // Add Actions for hot corners
-            Corners.RegisterHandler(CORNER.UPPER_LEFT, () => ArrangeWindows());
-            Corners.RegisterHandler(CORNER.UPPER_RIGHT, () => ShowDesktop());
+            Corners.RegisterHandler(CORNER.UpperLeft, () => ArrangeWindows());
+            Corners.RegisterHandler(CORNER.UpperRight, () => ShowDesktop());
         }
 
         void NotifyIcon_Click(object sender, EventArgs e)
         {
             mouseHook.Uninstall();
             keyHook.Uninstall();
-            this.Shutdown();
+            Shutdown();
         }
 
-        private void MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
+        private async void MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
         {
             Corners.TriggerOnHit(new System.Drawing.Point()
             {
@@ -61,10 +62,16 @@ namespace HotCorner
             });
 
             releasedKeys.Clear();
+
+            await Task.CompletedTask;
         }
 
-        private void KeyHook_KeyUp(KeyboardHook.VKeys key)
+        protected List<KeyboardHook.VKeys> m_keys = new List<KeyboardHook.VKeys>();
+
+        private async void KeyHook_KeyUp(KeyboardHook.VKeys key)
         {
+            // Console.WriteLine(key);
+
             if (key != KeyboardHook.VKeys.ESCAPE)
             {
                 releasedKeys.Clear();
@@ -86,6 +93,8 @@ namespace HotCorner
 
                 User32Util.SendInputSequence(sequence);
             }
+
+            await Task.CompletedTask;
         }
 
         public void ShowDesktop()

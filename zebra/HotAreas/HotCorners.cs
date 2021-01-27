@@ -15,14 +15,14 @@ namespace zebra
 
             foreach (var screen in Screen.AllScreens)
             {
-                CornerBoxes.Add(new HotBox(CORNER.UPPER_LEFT, screen.Bounds.Left - 8, screen.Bounds.Top - 8, 16, 16));
-                CornerBoxes.Add(new HotBox(CORNER.UPPER_RIGHT, screen.Bounds.Right - 8, screen.Bounds.Top - 8, 16, 16));
-                CornerBoxes.Add(new HotBox(CORNER.LOWER_RIGHT, screen.Bounds.Right - 8, screen.Bounds.Bottom - 8, 16, 16));
-                CornerBoxes.Add(new HotBox(CORNER.LOWER_LEFT, screen.Bounds.Left - 8, screen.Bounds.Bottom - 8, 16, 16));
+                CornerBoxes.Add(new HotBox(CORNER.UpperLeft, screen.Bounds.Left - 8, screen.Bounds.Top - 8, 16, 16));
+                CornerBoxes.Add(new HotBox(CORNER.UpperRight, screen.Bounds.Right - 8, screen.Bounds.Top - 8, 16, 16));
+                CornerBoxes.Add(new HotBox(CORNER.LowerRight, screen.Bounds.Right - 8, screen.Bounds.Bottom - 8, 16, 16));
+                CornerBoxes.Add(new HotBox(CORNER.LowerLeft, screen.Bounds.Left - 8, screen.Bounds.Bottom - 8, 16, 16));
             }
         }
 
-        protected Boolean BoxLock { get; set; }
+        protected bool BoxLock { get; set; }
 
         protected IList<HotBox> CornerBoxes { get; }
 
@@ -35,7 +35,7 @@ namespace zebra
 
         public void TriggerOnHit(Point point)
         {
-            Boolean hit = false;
+			bool hit = false;
             Action hitAction = null;
 
             foreach (HotBox box in CornerBoxes)

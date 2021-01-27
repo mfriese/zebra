@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace zebra
 {
@@ -7,17 +6,14 @@ namespace zebra
     {
         public HotBox(CORNER corner, int x, int y, int w, int h)
         {
-            this.Corner = corner;
-            this.Rect = new Rectangle(x, y, w, h);
+            Corner = corner;
+            Rect = new Rectangle(x, y, w, h);
         }
 
         public CORNER Corner { get; }
 
         public Rectangle Rect { get; }
 
-        public Boolean Contains(Point point)
-        {
-            return Rect.Contains(point);
-        }
+        public bool Contains(Point point) => Rect.Contains(point);
     }
 }
