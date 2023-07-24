@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3E436AC2-4941-4C83-B447-1BE690B2FAA2}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>zebra</RootNamespace>
-    <AssemblyName>zebra</AssemblyName>
+    <RootNamespace>EEE</RootNamespace>
+    <AssemblyName>3E</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -56,12 +56,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="HotAreas\Corner.cs" />
-    <Compile Include="HotAreas\HotCorners.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KeyboardHook.cs" />
-    <Compile Include="HotAreas\HotBox.cs" />
     <Compile Include="User32Util.cs" />
     <Compile Include="User32Keys.cs" />
     <Compile Include="MouseHook.cs" />

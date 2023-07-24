@@ -1,124 +1,94 @@
 ﻿using GlobalLowLevelHooks;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using zebra;
 
 namespace HotCorner
 {
-    public partial class App : Application
-    {
-        protected static List<KeyboardHook.VKeys> releasedKeys = new List<KeyboardHook.VKeys>();
+	public partial class App : Application
+	{
+		protected static List<TimedInput> releasedKeys = new List<TimedInput>();
 
-        protected static MouseHook mouseHook = null;
+		protected static KeyboardHook keyHook = null;
 
-        protected static KeyboardHook keyHook = null;
+		private void Application_Startup(object sender, StartupEventArgs e)
+		{
+			keyHook = new KeyboardHook();
 
-        protected static HotCorners Corners { get; } = new HotCorners();
+			keyHook.KeyUp += KeyHook_KeyUp;
 
-        private void Application_Startup(object sender, StartupEventArgs e)
-        {
-            mouseHook = new MouseHook();
-            keyHook = new KeyboardHook();
+			keyHook.Install();
+		}
 
-            // Capture mouse events
-            mouseHook.MouseMove += MouseMove;
-            keyHook.KeyUp += KeyHook_KeyUp;
+		private async void KeyHook_KeyUp(KeyboardHook.VKeys key)
+		{
+			releasedKeys.Add(new TimedInput()
+			{
+				Key = key,
+				Time = DateTime.Now
+			});
 
-            // Show an Icon in the tray
-            var bitmap = new Bitmap("./icon.png");
-            var iconHandle = bitmap.GetHicon();
-            var icon = Icon.FromHandle(iconHandle);
+			if (releasedKeys.
+				Where(rr => rr.Time.AddSeconds(1) > DateTime.Now).
+				Count(rr => rr.Key == KeyboardHook.VKeys.ESCAPE) >= 3)
+			{
+				releasedKeys.Clear();
 
-            var notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Click += NotifyIcon_Click;
-            notifyIcon.Icon = icon;
-            notifyIcon.Visible = true;
+				INPUT[] sequence = {
+					User32Util.MakeInput(KeyCode.ALT, false),
+					User32Util.MakeInput(KeyCode.F4, false),
+					User32Util.MakeInput(KeyCode.F4, true),
+					User32Util.MakeInput(KeyCode.ALT, true)
+				};
 
-            // Attach yourself to the system
-            mouseHook.Install();
-            keyHook.Install();
+				User32Util.SendInputSequence(sequence);
+				return;
+			}
 
-            // Add Actions for hot corners
-            Corners.RegisterHandler(CORNER.UpperLeft, () => ArrangeWindows());
-            Corners.RegisterHandler(CORNER.UpperRight, () => ShowDesktop());
-        }
+			while (releasedKeys.FirstOrDefault().Time.AddSeconds(5) < DateTime.Now)
+			{
+				releasedKeys.RemoveAt(0);
+			}
+			
+			await Task.CompletedTask;
+		}
 
-        void NotifyIcon_Click(object sender, EventArgs e)
-        {
-            mouseHook.Uninstall();
-            keyHook.Uninstall();
-            Shutdown();
-        }
+		public struct TimedInput
+		{
+			public DateTime Time
+			{
+				get; set;
+			}
+			public KeyboardHook.VKeys Key
+			{
+				get; set;
+			}
+		}
 
-        private async void MouseMove(MouseHook.MSLLHOOKSTRUCT mouseStruct)
-        {
-            Corners.TriggerOnHit(new System.Drawing.Point()
-            {
-                X = mouseStruct.pt.x,
-                Y = mouseStruct.pt.y
-            });
+		//public void ShowDesktop()
+		//{
+		//    INPUT[] sequence = {
+		//        User32Util.MakeInput(KeyCode.LWIN, false),
+		//        User32Util.MakeInput(KeyCode.KEY_D, false),
+		//        User32Util.MakeInput(KeyCode.KEY_D, true),
+		//        User32Util.MakeInput(KeyCode.LWIN, true)
+		//    };
 
-            releasedKeys.Clear();
+		//    User32Util.SendInputSequence(sequence);
+		//}
 
-            await Task.CompletedTask;
-        }
+		//private void ArrangeWindows()
+		//{
+		//    INPUT[] sequence = {
+		//        User32Util.MakeInput(KeyCode.LWIN, false),
+		//        User32Util.MakeInput(KeyCode.TAB, false),
+		//        User32Util.MakeInput(KeyCode.TAB, true),
+		//        User32Util.MakeInput(KeyCode.LWIN, true)
+		//    };
 
-        protected List<KeyboardHook.VKeys> m_keys = new List<KeyboardHook.VKeys>();
-
-        private async void KeyHook_KeyUp(KeyboardHook.VKeys key)
-        {
-            // Console.WriteLine(key);
-
-            if (key != KeyboardHook.VKeys.ESCAPE)
-            {
-                releasedKeys.Clear();
-                return;
-            }
-
-            releasedKeys.Add(key);
-
-            if (releasedKeys.Count > 2)
-            {
-                releasedKeys.Clear();
-
-                INPUT[] sequence = {
-                    User32Util.MakeInput(KeyCode.ALT, false),
-                    User32Util.MakeInput(KeyCode.F4, false),
-                    User32Util.MakeInput(KeyCode.F4, true),
-                    User32Util.MakeInput(KeyCode.ALT, true)
-                };
-
-                User32Util.SendInputSequence(sequence);
-            }
-
-            await Task.CompletedTask;
-        }
-
-        public void ShowDesktop()
-        {
-            INPUT[] sequence = {
-                User32Util.MakeInput(KeyCode.LWIN, false),
-                User32Util.MakeInput(KeyCode.KEY_D, false),
-                User32Util.MakeInput(KeyCode.KEY_D, true),
-                User32Util.MakeInput(KeyCode.LWIN, true)
-            };
-
-            User32Util.SendInputSequence(sequence);
-        }
-
-        private void ArrangeWindows()
-        {
-            INPUT[] sequence = {
-                User32Util.MakeInput(KeyCode.LWIN, false),
-                User32Util.MakeInput(KeyCode.TAB, false),
-                User32Util.MakeInput(KeyCode.TAB, true),
-                User32Util.MakeInput(KeyCode.LWIN, true)
-            };
-
-            User32Util.SendInputSequence(sequence);
-        }
-    }
+		//    User32Util.SendInputSequence(sequence);
+		//}
+	}
 }
